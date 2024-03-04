@@ -1,0 +1,17 @@
+# Virtual environment
+/venv/
+/housing/
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Dependency directories
+/site-packages/
+/.venv/
+
+# IDE/Editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
