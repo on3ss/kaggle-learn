@@ -3,14 +3,16 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
-from utils import file_util
+from utils.file_util import file_path
+
 
 def predict(model, train_x, val_x, train_y):
     model.fit(train_x, train_y)
     return model.predict(val_x)
 
+
 def main():
-    datafile_path = file_util.file_path("datasets", "melb_data.csv")
+    datafile_path = file_path("datasets", "melb_data.csv")
     dataset = pd.read_csv(datafile_path)
     features = ["Rooms", "Bathroom", "Landsize", "Lattitude", "Longtitude"]
     x = dataset[features]
@@ -24,7 +26,9 @@ def main():
     for max_leaf_nodes in fittings:
         predictions = predict(
             DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes),
-            train_x, val_x, train_y
+            train_x,
+            val_x,
+            train_y,
         )
         mae = mean_absolute_error(val_y, predictions)
         print(f"Max Leaf Nodes: {max_leaf_nodes} \t MAE: {mae}")
