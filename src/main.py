@@ -24,7 +24,7 @@ def main():
 
     print("DecisionTreeRegressor")
     for max_leaf_nodes in max_leaf_nodes_list:
-        mae = prediction.predict(
+        mae = prediction.calculate_mae(
             DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes), melbourne_data
         )
         print(f"Max Leaf Nodes: {max_leaf_nodes} \t MAE: {mae}")
@@ -32,7 +32,7 @@ def main():
     print("\n")
 
     print("RandomForestRegressor")
-    mae = prediction.predict(RandomForestRegressor(), melbourne_data)
+    mae = prediction.calculate_mae(RandomForestRegressor(), melbourne_data)
     print(f"MAE: {mae}")
 
 

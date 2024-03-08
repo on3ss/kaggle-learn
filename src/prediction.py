@@ -5,7 +5,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 
-def predict(model, data: pd.DataFrame):
+def calculate_mae(model, data: pd.DataFrame):
     """
     Trains a Decision Tree Regressor model on
     housing data and prints predictions for the first 5 houses.
