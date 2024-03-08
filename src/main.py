@@ -32,7 +32,9 @@ def main():
     print("\n")
 
     print("RandomForestRegressor")
-    mae = prediction.calculate_mae(RandomForestRegressor(), melbourne_data)
+    mae = prediction.calculate_mae(
+        RandomForestRegressor(random_state=1), melbourne_data
+    )
     print(f"MAE: {mae}")
 
 
