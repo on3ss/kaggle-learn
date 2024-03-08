@@ -3,7 +3,6 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer
 from utils import file_util
 
 def predict(model, train_x, val_x, train_y):
