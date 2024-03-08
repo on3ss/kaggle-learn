@@ -1,21 +1,42 @@
+"""Module for making basic predictions using Decision Tree Regressor."""
+
+from typing import Union
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
-from utils import file_util
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
 
 
-def predict():
-    melbourne_data_file_path = file_util.file_path("datasets", "melb_data.csv")
-    melbourne_data = pd.read_csv(melbourne_data_file_path)
+def predict(data: pd.DataFrame, max_leaf_nodes: Union[int, None] = None):
+    """
+    Trains a Decision Tree Regressor model on
+    housing data and prints predictions for the first 5 houses.
 
+    Parameters:
+        data: DataFrame containing housing data with columns
+        'Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude', and 'Price'.
+
+    Returns:
+        None
+    """
     features = ["Rooms", "Bathroom", "Landsize", "Lattitude", "Longtitude"]
+    x = data[features]
+    y = data.Price
 
-    x = melbourne_data[features]
-    y = melbourne_data.Price
+    train_x, val_x, train_y, val_y = train_test_split(x, y, random_state=0)
 
-    model = DecisionTreeRegressor(random_state=1)
-    model.fit(x, y)
+    model = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes)
+    model.fit(train_x, train_y)
+    print("Predicted prices:")
+    predictions = model.predict(val_x)
+    return mean_absolute_error(val_y, predictions)
 
-    print("Making predictions for the following 5 houses:")
-    print(x.head())
-    print("The predictions are")
-    print(model.predict(x.head()))
+
+def run_predictions(data: pd.DataFrame):
+    """
+    Run predictions for different value of max leaf nodes
+    """
+    for leaf_nodes in [None, 5, 50, 500, 5000]:
+        print(
+            f"Leaf Node: {leaf_nodes} | Mean Absolute Error: {predict(data, leaf_nodes)}"
+        )
