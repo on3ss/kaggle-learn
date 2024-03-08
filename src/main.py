@@ -1,40 +1,42 @@
-"""
-Predict housing prices using decision tree and random forest regressors.
-"""
-
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
-import prediction
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
 from utils import file_util
 
+def predict(model, train_x, val_x, train_y):
+    model.fit(train_x, train_y)
+    return model.predict(val_x)
 
 def main():
-    """
-    Main function to perform housing price prediction.
+    datafile_path = file_util.file_path("datasets", "melb_data.csv")
+    dataset = pd.read_csv(datafile_path)
+    features = ["Rooms", "Bathroom", "Landsize", "Lattitude", "Longtitude"]
+    x = dataset[features]
+    y = dataset.Price
 
-    Reads the Melbourne housing dataset, iterates over different values of max_leaf_nodes for DecisionTreeRegressor,
-    and fits both DecisionTreeRegressor and RandomForestRegressor models to predict housing prices.
-    Prints mean absolute error (MAE) for each model.
-    """
-    melbourne_data_file_path = file_util.file_path("datasets", "melb_data.csv")
-    melbourne_data = pd.read_csv(melbourne_data_file_path)
+    train_x, val_x, train_y, val_y = train_test_split(x, y, random_state=0)
 
     fittings = [None, 5, 50, 500, 5000]
 
     print("DecisionTreeRegressor")
     for max_leaf_nodes in fittings:
-        mae = prediction.calculate_mae(
-            DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes), melbourne_data
+        predictions = predict(
+            DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes),
+            train_x, val_x, train_y
         )
+        mae = mean_absolute_error(val_y, predictions)
         print(f"Max Leaf Nodes: {max_leaf_nodes} \t MAE: {mae}")
 
     print("\n")
 
     print("RandomForestRegressor")
-    mae = prediction.calculate_mae(
-        RandomForestRegressor(random_state=1), melbourne_data
+    predictions = predict(
+        RandomForestRegressor(random_state=1), train_x, val_x, train_y
     )
+    mae = mean_absolute_error(val_y, predictions)
     print(f"MAE: {mae}")
 
 
