@@ -1,11 +1,22 @@
+"""
+Predict housing prices using decision tree and random forest regressors.
+"""
+
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
-import basic_prediction
+import prediction
 from utils import file_util
 
 
 def main():
+    """
+    Main function to perform housing price prediction.
+
+    Reads the Melbourne housing dataset, iterates over different values of max_leaf_nodes for DecisionTreeRegressor,
+    and fits both DecisionTreeRegressor and RandomForestRegressor models to predict housing prices.
+    Prints mean absolute error (MAE) for each model.
+    """
     melbourne_data_file_path = file_util.file_path("datasets", "melb_data.csv")
     melbourne_data = pd.read_csv(melbourne_data_file_path)
 
@@ -13,7 +24,7 @@ def main():
 
     print("DecisionTreeRegressor")
     for max_leaf_nodes in max_leaf_nodes_list:
-        mae = basic_prediction.predict(
+        mae = prediction.predict(
             DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes), melbourne_data
         )
         print(f"Max Leaf Nodes: {max_leaf_nodes} \t MAE: {mae}")
@@ -21,7 +32,7 @@ def main():
     print("\n")
 
     print("RandomForestRegressor")
-    mae = basic_prediction.predict(RandomForestRegressor(), melbourne_data)
+    mae = prediction.predict(RandomForestRegressor(), melbourne_data)
     print(f"MAE: {mae}")
 
 
