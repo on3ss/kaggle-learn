@@ -20,10 +20,10 @@ def main():
     melbourne_data_file_path = file_util.file_path("datasets", "melb_data.csv")
     melbourne_data = pd.read_csv(melbourne_data_file_path)
 
-    max_leaf_nodes_list = [None, 5, 50, 500, 5000]
+    fittings = [None, 5, 50, 500, 5000]
 
     print("DecisionTreeRegressor")
-    for max_leaf_nodes in max_leaf_nodes_list:
+    for max_leaf_nodes in fittings:
         mae = prediction.calculate_mae(
             DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes), melbourne_data
         )
