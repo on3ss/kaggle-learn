@@ -22,14 +22,19 @@ def main():
         x, y, train_size=0.8, test_size=0.2, random_state=0, shuffle=True
     )
 
+    cols_with_missing = [col for col in train_x if train_x[col].isnull().any()]
+
+    reduced_train_x = train_x.drop(cols_with_missing, axis=1)
+    reduced_valid_x = val_x.drop(cols_with_missing, axis=1)
+
     fittings = [None, 5, 50, 500, 5000]
 
     print("DecisionTreeRegressor")
     for max_leaf_nodes in fittings:
         predictions = predict(
             DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes),
-            train_x,
-            val_x,
+            reduced_train_x,
+            reduced_valid_x,
             train_y,
         )
         mae = mean_absolute_error(val_y, predictions)
@@ -39,7 +44,7 @@ def main():
 
     print("RandomForestRegressor")
     predictions = predict(
-        RandomForestRegressor(random_state=1), train_x, val_x, train_y
+        RandomForestRegressor(random_state=1), reduced_train_x, reduced_valid_x, train_y
     )
     mae = mean_absolute_error(val_y, predictions)
     print(f"MAE: {mae}")
