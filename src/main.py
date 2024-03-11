@@ -18,7 +18,9 @@ def main():
     x = dataset[features]
     y = dataset.Price
 
-    train_x, val_x, train_y, val_y = train_test_split(x, y, random_state=0)
+    train_x, val_x, train_y, val_y = train_test_split(
+        x, y, train_size=0.8, test_size=0.2, random_state=0, shuffle=True
+    )
 
     fittings = [None, 5, 50, 500, 5000]
 
