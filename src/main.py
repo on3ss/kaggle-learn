@@ -3,6 +3,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
 from utils.file_util import file_path
 
 
@@ -22,10 +23,20 @@ def main():
         x, y, train_size=0.8, test_size=0.2, random_state=0, shuffle=True
     )
 
-    cols_with_missing = [col for col in train_x if train_x[col].isnull().any()]
+    train_x_plus = train_x.copy()
+    val_x_plus = val_x.copy()
 
-    reduced_train_x = train_x.drop(cols_with_missing, axis=1)
-    reduced_valid_x = val_x.drop(cols_with_missing, axis=1)
+    cols_with_missing = [col for col in train_x.columns if train_x[col].isnull().any()]
+    for col in cols_with_missing:
+        train_x_plus[col + "_was_missing"] = train_x_plus[col].isnull()
+        val_x_plus[col + "_was_missing"] = val_x_plus[col].isnull()
+
+    my_imputer = SimpleImputer()
+    imputed_train_x = pd.DataFrame(my_imputer.fit_transform(train_x_plus))
+    imputed_val_x = pd.DataFrame(my_imputer.fit_transform(val_x_plus))
+
+    imputed_train_x.columns = train_x_plus.columns
+    imputed_val_x.columns = val_x_plus.columns
 
     fittings = [None, 5, 50, 500, 5000]
 
@@ -33,8 +44,8 @@ def main():
     for max_leaf_nodes in fittings:
         predictions = predict(
             DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes),
-            reduced_train_x,
-            reduced_valid_x,
+            imputed_train_x,
+            imputed_val_x,
             train_y,
         )
         mae = mean_absolute_error(val_y, predictions)
@@ -44,7 +55,7 @@ def main():
 
     print("RandomForestRegressor")
     predictions = predict(
-        RandomForestRegressor(random_state=1), reduced_train_x, reduced_valid_x, train_y
+        RandomForestRegressor(random_state=1), imputed_train_x, imputed_val_x, train_y
     )
     mae = mean_absolute_error(val_y, predictions)
     print(f"MAE: {mae}")
