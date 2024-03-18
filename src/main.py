@@ -3,11 +3,17 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
+import sklearn
 from sklearn.impute import SimpleImputer
 from utils.file_util import file_path
 
 
-def predict(model, train_x, val_x, train_y):
+def predict(
+    model: sklearn.base.BaseEstimator,
+    train_x: pd.DataFrame,
+    val_x: pd.DataFrame,
+    train_y: pd.Series,
+) -> pd.Series:
     """
     Predict the house prices using the given model and data.
 
