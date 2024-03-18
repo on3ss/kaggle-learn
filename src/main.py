@@ -1,10 +1,11 @@
 import pandas as pd
+import sklearn
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
-import sklearn
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
 from utils.file_util import file_path
 
 
@@ -38,7 +39,7 @@ def predict(
     return model.predict(val_x)
 
 
-def preprocess_data(
+def impute_data(
     train_x: pd.DataFrame, val_x: pd.DataFrame
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -76,6 +77,36 @@ def preprocess_data(
     return imputed_train_x, imputed_val_x
 
 
+def one_hot_encode(
+    train_x: pd.DataFrame, val_x: pd.DataFrame, categorical_columns
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    # Select categorical columns for one-hot encoding
+    train_categorical = train_x[categorical_columns]
+    val_categorical = val_x[categorical_columns]
+
+    # Perform one-hot encoding
+    OH_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+    OH_cols_train = pd.DataFrame(OH_encoder.fit_transform(train_categorical))
+    OH_cols_valid = pd.DataFrame(OH_encoder.transform(val_categorical))
+
+    # Restore index
+    OH_cols_train.index = train_x.index
+    OH_cols_valid.index = val_x.index
+
+    # Drop original categorical columns from the dataset
+    train_x = train_x.drop(categorical_columns, axis=1)
+    val_x = val_x.drop(categorical_columns, axis=1)
+
+    # Concatenate the encoded columns with the original DataFrame
+    train_x = pd.concat([train_x, OH_cols_train], axis=1)
+    val_x = pd.concat([val_x, OH_cols_valid], axis=1)
+
+    train_x.columns = train_x.columns.astype("string")
+    val_x.columns = val_x.columns.astype("string")
+
+    return train_x, val_x
+
+
 def main():
     """
     Main function to run the data analysis.
@@ -85,7 +116,16 @@ def main():
     dataset = pd.read_csv(datafile_path)
 
     # Define features and target variable
-    features = ["Rooms", "Bathroom", "Landsize", "Lattitude", "Longtitude"]
+    features = [
+        "Type",
+        "Method",
+        "Regionname",
+        "Rooms",
+        "Bathroom",
+        "Landsize",
+        "Lattitude",
+        "Longtitude",
+    ]
     x = dataset[features]
     y = dataset.Price
 
@@ -95,7 +135,9 @@ def main():
     )
 
     # Preprocess data
-    train_x, val_x = preprocess_data(train_x, val_x)
+    train_x, val_x = impute_data(
+        *one_hot_encode(train_x, val_x, ["Type", "Method", "Regionname"])
+    )
 
     fittings = [None, 5, 50, 500, 5000]
 
@@ -112,7 +154,7 @@ def main():
 
     print("\nRandomForestRegressor")
     predictions = predict(
-        RandomForestRegressor(random_state=1), train_x, val_x, train_y
+        RandomForestRegressor(n_estimators=100, random_state=0), train_x, val_x, train_y
     )
     mae = mean_absolute_error(val_y, predictions)
     print(f"MAE: {mae}")
