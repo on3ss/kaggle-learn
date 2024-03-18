@@ -1,7 +1,3 @@
-"""
-Module for handling file paths relative to the root directory of the project.
-"""
-
 import os
 
 
@@ -12,7 +8,7 @@ def root_dir() -> str:
     Returns:
         str: Absolute path to the root directory of the project.
     """
-    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
 def file_path(directory: str, filename: str) -> str:

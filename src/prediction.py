@@ -1,27 +1,26 @@
-"""Module for making basic predictions using Decision Tree Regressor."""
-
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 
-def calculate_mae(model, data: pd.DataFrame):
+def calculate_mae(model, data: pd.DataFrame) -> float:
     """
-    Trains a Decision Tree Regressor model on
-    housing data and prints predictions for the first 5 houses.
+    Trains a model on housing data and calculates Mean Absolute Error (MAE).
 
     Parameters:
-        data: DataFrame containing housing data with columns
-        'Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude', and 'Price'.
+        model: Regression model to train.
+        data: DataFrame containing housing data with columns:
+              'Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude', and 'Price'.
 
     Returns:
-        None
+        float: Mean Absolute Error (MAE) of the model.
     """
     features = ["Rooms", "Bathroom", "Landsize", "Lattitude", "Longtitude"]
-    x = data[features]
-    y = data.Price
+    X = data[features]
+    y = data["Price"]
 
-    train_x, val_x, train_y, val_y = train_test_split(x, y, random_state=0)
-    model.fit(train_x, train_y)
-    predictions = model.predict(val_x)
-    return mean_absolute_error(val_y, predictions)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=0)
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_val)
+    mae = mean_absolute_error(y_val, predictions)
+    return mae
